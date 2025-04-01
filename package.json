@@ -32,5 +32,8 @@
   "bugs": {
     "url": "https://github.com/Yeyobitz/probandoMCP/issues"
   },
-  "homepage": "https://github.com/Yeyobitz/probandoMCP#readme"
+  "homepage": "https://github.com/Yeyobitz/probandoMCP#readme",
+  "dependencies": {
+    "three": "^0.175.0"
+  }
 }
