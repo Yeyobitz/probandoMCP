@@ -3,7 +3,7 @@
 ## Sprint 1: Configuración y Prototipo Base (3 semanas)
 
 ### Semana 1: Configuración del Entorno
-- [ ] Crear repositorio y estructura de carpetas
+- [x] Crear repositorio y estructura de carpetas
 - [ ] Configurar entorno de desarrollo (linters, build process)
 - [ ] Implementar Three.js base con canvas responsive
 - [ ] Crear escena 3D básica (cámara, iluminación, controles)
