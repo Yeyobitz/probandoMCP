@@ -6,11 +6,11 @@
 - [x] Crear repositorio y estructura de carpetas
 - [x] Configurar entorno de desarrollo (linters, build process)
 - [x] Implementar Three.js base con canvas responsive
-- [ ] Crear escena 3D básica (cámara, iluminación, controles)
-- [ ] Configurar sistema de shaders PS1 básico
-  - [ ] Implementar vertex jitter
-  - [ ] Implementar texture warping
-  - [ ] Añadir efecto de baja resolución
+- [x] Crear escena 3D básica (cámara, iluminación, controles)
+- [x] Configurar sistema de shaders PS1 básico
+  - [x] Implementar vertex jitter
+  - [x] Implementar texture warping
+  - [x] Añadir efecto de baja resolución
 
 ### Semana 2: Prototipo de Mascota
 - [ ] Modelar mascota básica (tipo DataByte)
