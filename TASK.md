@@ -4,7 +4,7 @@
 
 ### Semana 1: Configuración del Entorno
 - [x] Crear repositorio y estructura de carpetas
-- [ ] Configurar entorno de desarrollo (linters, build process)
+- [x] Configurar entorno de desarrollo (linters, build process)
 - [ ] Implementar Three.js base con canvas responsive
 - [ ] Crear escena 3D básica (cámara, iluminación, controles)
 - [ ] Configurar sistema de shaders PS1 básico
