@@ -44,11 +44,38 @@
   - [x] Detección mejorada de waypoints para evitar que la mascota se "pase de largo"
 
 ### Semana 3: Interacción Básica
-- [ ] Crear interfaz de usuario mínima (HUD, menús)
-- [ ] Implementar controles para interactuar con mascota
-- [ ] Desarrollar sistema de cámara para diferentes vistas
+- [x] Crear interfaz de usuario mínima (HUD, menús)
+  - [x] Diseño retro con fuente Press Start 2P 
+  - [x] HUD de estadísticas de la mascota
+  - [x] Botones de acción principal
+  - [x] Sistema de notificaciones
+  - [x] Menú de opciones
+  - [x] Sistema de pestañas para organizar estadísticas
+- [x] Implementar controles para interactuar con mascota
+  - [x] Alimentación de la mascota
+  - [x] Jugar con la mascota
+  - [x] Descansar/dormir
+  - [x] Limpiar la mascota
+  - [x] Entrenar la mascota
+  - [x] Socializar con la mascota
+  - [x] Modo de depuración
+  - [x] Corrección de lógica de interacción con estadísticas
+- [x] Sistema de estadísticas ampliado
+  - [x] Estadísticas básicas: Salud, Ataque, Defensa, Velocidad, Inteligencia
+  - [x] Estadísticas avanzadas: Agilidad, Suerte, Resistencia, Adaptabilidad
+  - [x] Necesidades primarias: Hambre, Felicidad, Energía
+  - [x] Necesidades secundarias: Higiene, Social, Entrenamiento, Lealtad
+  - [x] Sistema de niveles y experiencia
+  - [x] Especialidades evolutivas: Datos, Seguridad, Red, Cifrado, Malware
+- [x] Desarrollar sistema de cámara para diferentes vistas
+  - [x] Vista por defecto 
+  - [x] Vista superior
+  - [x] Vista en primera persona
 - [ ] Añadir sistema de guardado local básico
-- [ ] Testing del prototipo y ajustes iniciales
+- [x] Testing del prototipo y ajustes iniciales
+  - [x] Corrección de z-index para visibilidad de UI
+  - [x] Ajustes del comportamiento basado en necesidades
+  - [x] Mensajes de notificación en español
 
 ## Sprint 2: Sistema de Combate (4 semanas)
 
@@ -197,3 +224,29 @@
 - [ ] Crear editor de apariencia para mascotas
 - [ ] Implementar sistema de comercio entre jugadores
 - [ ] Desarrollar funcionalidades para streaming/compartir
+
+- [x] Implementar sistema para organizar estadísticas en tabs
+  - [x] Pestaña de Necesidades
+  - [x] Pestaña de Atributos
+  - [x] Pestaña de Progreso
+- [x] Limpiar el pet
+- [x] Socializar con el pet
+- [x] Sistema de estadísticas expandido
+  - [x] Atributos básicos (Salud, Ataque, Defensa, Velocidad, Inteligencia)
+  - [x] Atributos avanzados (Agilidad, Suerte, Resistencia, Adaptabilidad)
+  - [x] Necesidades primarias (Hambre, Felicidad, Energía)
+  - [x] Necesidades secundarias (Higiene, Social, Lealtad)
+- [x] Sistema de niveles y experiencia
+- [x] Eliminar sistema de entrenamiento
+- [ ] Implementar sistema de distribución de puntos de estadísticas
+  - [ ] Interfaz para asignar 5 puntos al subir de nivel
+  - [ ] Permitir asignar puntos a diferentes atributos
+  - [ ] Mostrar puntos disponibles
+  - [ ] Botón para confirmar la asignación
+- [ ] Implementar escena de batalla
+  - [ ] Diseñar sistema ATB (Active Time Battle)
+  - [ ] Crear clase BattleSystem
+  - [ ] Implementar interfaz de batalla
+  - [ ] Desarrollar enemigos básicos
+  - [ ] Sistema de recompensas (EXP, drops)
+  - [ ] Implementar primera zona de batalla temática (Servidor)

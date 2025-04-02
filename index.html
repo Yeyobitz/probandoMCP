@@ -4,12 +4,222 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DigiVirus</title>
+    <link rel="stylesheet" href="./public/styles.css">
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
+        /* Inline CSS de respaldo para garantizar que la UI sea visible */
+        canvas { z-index: 1; }
+        #hud, #controls { z-index: 10; }
+        #menu { z-index: 20; }
+        .notification { z-index: 30; }
+        .stats-panel {
+            background-color: rgba(4, 8, 15, 0.85);
+            border: 4px solid #2E86AB;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- Main HUD -->
+    <div id="hud">
+        <div class="stats-panel">
+            <div class="pet-name">BITZY</div>
+            <div class="pet-level">NIVEL <span id="pet-level">1</span></div>
+            
+            <!-- Tabs para categorías de estadísticas -->
+            <div class="stats-tabs">
+                <button class="tab-button active" data-tab="needs">NECESIDADES</button>
+                <button class="tab-button" data-tab="attributes">ATRIBUTOS</button>
+                <button class="tab-button" data-tab="progress">PROGRESO</button>
+            </div>
+            
+            <!-- Tab de necesidades -->
+            <div class="tab-content" id="needs-tab">
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>HAMBRE</span>
+                        <span class="stats-value" id="hunger-value">100%</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="hunger-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>FELICIDAD</span>
+                        <span class="stats-value" id="happiness-value">100%</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="happiness-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>ENERGÍA</span>
+                        <span class="stats-value" id="energy-value">100%</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="energy-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>HIGIENE</span>
+                        <span class="stats-value" id="hygiene-value">100%</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="hygiene-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>SOCIAL</span>
+                        <span class="stats-value" id="social-value">100%</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="social-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>LEALTAD</span>
+                        <span class="stats-value" id="loyalty-value">75%</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="loyalty-fill" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab de atributos -->
+            <div class="tab-content" id="attributes-tab" style="display: none;">
+                <div class="attributes-grid">
+                    <div class="attribute-item">
+                        <span class="attribute-label">SALUD</span>
+                        <span class="attribute-value" id="health-value">100</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">ATAQUE</span>
+                        <span class="attribute-value" id="attack-value">10</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">DEFENSA</span>
+                        <span class="attribute-value" id="defense-value">10</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">VELOCIDAD</span>
+                        <span class="attribute-value" id="speed-value">10</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">INTELIGENCIA</span>
+                        <span class="attribute-value" id="intelligence-value">10</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">AGILIDAD</span>
+                        <span class="attribute-value" id="agility-value">10</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">SUERTE</span>
+                        <span class="attribute-value" id="luck-value">10</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">RESISTENCIA</span>
+                        <span class="attribute-value" id="resistance-value">10</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-label">ADAPTABILIDAD</span>
+                        <span class="attribute-value" id="adaptability-value">10</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab de progreso -->
+            <div class="tab-content" id="progress-tab" style="display: none;">
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>EXPERIENCIA</span>
+                        <span class="stats-value" id="exp-value">0/100</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="exp-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stats-label">
+                        <span>EVOLUCIÓN</span>
+                        <span class="stats-value" id="evolution-value">0%</span>
+                    </div>
+                    <div class="stats-progress">
+                        <div class="stats-progress-fill" id="evolution-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="specialty-chart">
+                    <h4>ESPECIALIDADES</h4>
+                    <div class="specialty-item">
+                        <span>DATOS</span>
+                        <div class="stats-progress">
+                            <div class="stats-progress-fill" id="data-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div class="specialty-item">
+                        <span>SEGURIDAD</span>
+                        <div class="stats-progress">
+                            <div class="stats-progress-fill" id="security-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div class="specialty-item">
+                        <span>RED</span>
+                        <div class="stats-progress">
+                            <div class="stats-progress-fill" id="network-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div class="specialty-item">
+                        <span>CIFRADO</span>
+                        <div class="stats-progress">
+                            <div class="stats-progress-fill" id="cipher-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div class="specialty-item">
+                        <span>MALWARE</span>
+                        <div class="stats-progress">
+                            <div class="stats-progress-fill" id="malware-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Controls -->
+    <div id="controls">
+        <button class="retro-button" id="feed-btn">Alimentar</button>
+        <button class="retro-button" id="play-btn">Jugar</button>
+        <button class="retro-button" id="rest-btn">Descansar</button>
+        <button class="retro-button" id="clean-btn">Limpiar</button>
+        <button class="retro-button" id="socialize-btn">Socializar</button>
+        <button class="retro-button" id="menu-btn">Menú</button>
+    </div>
+    
+    <!-- Menu -->
+    <div id="menu">
+        <h2 class="menu-header">MENÚ</h2>
+        <div class="menu-options">
+            <button class="retro-button" id="save-btn">Guardar Juego</button>
+            <button class="retro-button" id="camera-btn">Cambiar Vista</button>
+            <button class="retro-button" id="debug-btn">Modo Debug</button>
+            <button class="retro-button" id="close-menu-btn">Cerrar</button>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">Notification text goes here</div>
+    
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>

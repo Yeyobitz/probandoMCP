@@ -53,8 +53,19 @@ DigiVirus es un simulador de mascotas virtuales 3D inspirado en Digimon, con gr�
 
 #### Sistema de Mascotas
 - 5 tipos base de mascotas iniciales
-- Estadísticas: Salud, Ataque, Defensa, Velocidad, Inteligencia
-- Necesidades: Hambre, Felicidad, Energía
+- Estadísticas básicas:
+  - Salud, Ataque, Defensa, Velocidad, Inteligencia
+- Estadísticas avanzadas:
+  - Agilidad, Suerte, Resistencia, Adaptabilidad
+- Necesidades primarias:
+  - Hambre, Felicidad, Energía
+- Necesidades secundarias:
+  - Higiene, Social, Lealtad
+- Sistema de niveles y experiencia:
+  - Ganancia de EXP mediante socialización y combates
+  - 5 puntos de estadísticas para distribuir al subir nivel
+- Especialidades evolutivas:
+  - Datos, Seguridad, Red, Cifrado, Malware
 - Personalidad que evoluciona según cómo el jugador interactúa con la mascota
 
 #### Sistema de Evolución
@@ -64,7 +75,7 @@ DigiVirus es un simulador de mascotas virtuales 3D inspirado en Digimon, con gr�
   - Estilo de combate
   - Alimentación
   - Nivel de felicidad
-  - Tipo de entrenamiento
+  - Distribución de puntos de estadísticas
 - Evoluciones especiales y secretas mediante combinaciones específicas
 
 #### Sistema de Combate
@@ -72,6 +83,7 @@ DigiVirus es un simulador de mascotas virtuales 3D inspirado en Digimon, con gr�
 - 4 tipos de acciones: Ataques básicos, Habilidades especiales, Ítems, Cambio de postura
 - Ventajas/desventajas elementales: Datos, Seguridad, Red, Cifrado, Malware
 - Batallas con aliados visitantes que actúan según su propia IA
+- Ganancia de experiencia y puntos de estadísticas
 
 #### Componente Social
 - Sistema de amigos (agregar, eliminar, buscar)

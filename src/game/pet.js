@@ -14,24 +14,49 @@ export class Pet {
     this.animations = {};
     this.currentAnimation = null;
     
-    // Pet attributes
+    // Pet attributes - Stats básicos
     this.attributes = {
       health: 100,
       attack: 10,
       defense: 10,
       speed: 10,
-      intelligence: 10
+      intelligence: 10,
+      // Nuevos atributos
+      agility: 10,      // Esquivar en combate
+      luck: 10,         // Críticos y recompensas
+      resistance: 10,   // Resistencia a estados alterados
+      adaptability: 10  // Velocidad de aprendizaje
     };
     
-    // Pet needs
+    // Pet needs - Necesidades
     this.needs = {
-      hunger: 100, // Full (100) to empty (0)
+      hunger: 100,       // Full (100) to empty (0)
       happiness: 100,
-      energy: 100
+      energy: 100,
+      // Nuevas necesidades
+      hygiene: 100,      // Limpieza
+      social: 100,       // Necesidad de socialización
+      loyalty: 75        // Vínculo con el jugador
+    };
+    
+    // Estadísticas de progresión
+    this.progression = {
+      experience: 0,            // Experiencia acumulada
+      level: 1,                 // Nivel actual
+      evolutionPoints: 0,       // Puntos hacia evolución
+      requiredExpForNextLevel: 100,  // Exp para siguiente nivel
+      statPoints: 0,            // Puntos para asignar a estadísticas
+      specialty: {              // Tendencias evolutivas (0-100)
+        data: 50,               // Tipo de datos
+        security: 50,           // Tipo seguridad
+        network: 50,            // Tipo red
+        cipher: 50,             // Tipo cifrado
+        malware: 50             // Tipo malware
+      }
     };
     
     // Pet state
-    this.state = 'idle'; // idle, walking, sleeping
+    this.state = 'idle'; // idle, walking, sleeping, training, playing, bathing
     
     // Glitch intensity - can be modified based on pet status
     this.glitchIntensity = 0.2;
@@ -286,10 +311,8 @@ export class Pet {
       });
     }
     
-    // Decrease needs over time (very slowly for now)
-    this.needs.hunger = Math.max(0, this.needs.hunger - clampedDeltaTime * 0.05);
-    this.needs.happiness = Math.max(0, this.needs.happiness - clampedDeltaTime * 0.03);
-    this.needs.energy = Math.max(0, this.needs.energy - clampedDeltaTime * 0.02);
+    // Update pet needs based on time
+    this.updateNeeds(clampedDeltaTime);
     
     // Change state based on needs
     this.updateState();
@@ -542,13 +565,24 @@ export class Pet {
   togglePathVisualization() {
     this.showPathVisualization = !this.showPathVisualization;
     
+    // Remove existing path visualization
+    this.pathVisualization.forEach(obj => {
+      if (obj && this.scene) {
+        this.scene.remove(obj);
+      }
+    });
+    
+    this.pathVisualization = [];
+    
+    // If enabled, create new path visualization
     if (this.showPathVisualization && this.waypoints.length > 0) {
       this.visualizePath();
-    } else {
-      this.clearPathVisualization();
     }
     
-    return this.showPathVisualization;
+    // Toggle visibility of debug cube
+    if (this.debugCube) {
+      this.debugCube.visible = this.showPathVisualization;
+    }
   }
   
   updateState() {
@@ -562,21 +596,101 @@ export class Pet {
   }
   
   // Methods to interact with the pet
+  /**
+   * Feed the pet to decrease hunger
+   * @param {number} amount - Amount to decrease hunger by
+   * @returns {boolean} - True if pet was fed, false if not hungry
+   */
   feed(amount) {
+    // Si hunger está alto (más de 80%), la mascota no tiene hambre
+    if (this.needs.hunger > 80) {
+      return false;
+    }
+    
+    // Aumentar valor de hunger (menos hambre)
     this.needs.hunger = Math.min(100, this.needs.hunger + amount);
-    console.log(`${this.name} has been fed! Hunger: ${this.needs.hunger}`);
+    
+    // Slightly increase happiness when fed
+    this.needs.happiness = Math.min(100, this.needs.happiness + (amount * 0.2));
+    
+    // Return to idle state if sleeping
+    if (this.state === 'sleeping') {
+      this.setState('idle');
+    }
+    
+    return true;
   }
   
-  play() {
-    this.needs.happiness = Math.min(100, this.needs.happiness + 15);
-    this.needs.energy = Math.max(0, this.needs.energy - 5);
-    console.log(`Played with ${this.name}! Happiness: ${this.needs.happiness}`);
+  /**
+   * Play with the pet to increase happiness
+   * @param {number} amount - Amount to increase happiness by
+   * @returns {boolean} - True if played with pet, false if pet is too tired
+   */
+  play(amount) {
+    // Si energy está demasiado bajo, mascota está muy cansada para jugar
+    if (this.needs.energy < 20) {
+      return false;
+    }
+    
+    // Increase happiness
+    this.needs.happiness = Math.min(100, this.needs.happiness + amount);
+    
+    // Decrease energy from playing
+    this.needs.energy = Math.max(0, this.needs.energy - (amount * 0.5));
+    
+    // Decrease hunger slightly from activity (get more hungry)
+    this.needs.hunger = Math.max(0, this.needs.hunger - (amount * 0.3));
+    
+    // Set to walking state if not already
+    if (this.state !== 'walking') {
+      this.setState('walking');
+      
+      // Generate a more complex path when playing
+      const extraWaypoints = Math.floor(amount / 5); // More play = more complex path
+      this.generateRandomPath(this.pathComplexity.min + extraWaypoints);
+    }
+    
+    return true;
   }
   
-  rest() {
-    this.needs.energy = Math.min(100, this.needs.energy + 30);
-    this.playAnimation('sleeping');
-    console.log(`${this.name} is resting. Energy: ${this.needs.energy}`);
+  /**
+   * Let the pet rest to regain energy
+   * @param {number} amount - Amount to increase energy by
+   * @returns {boolean} - True if pet is resting, false otherwise
+   */
+  rest(amount) {
+    // Si energy ya está muy alto, mascota no quiere dormir
+    if (this.needs.energy > 80 && this.needs.happiness > 40) {
+      return false;
+    }
+    
+    // Increase energy
+    this.needs.energy = Math.min(100, this.needs.energy + amount);
+    
+    // Decrease happiness slightly when resting if already high
+    if (this.needs.happiness > 60) {
+      this.needs.happiness = Math.max(0, this.needs.happiness - (amount * 0.1));
+    }
+    
+    // Set to sleeping state
+    if (this.state !== 'sleeping') {
+      this.setState('sleeping');
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Set the pet's state and update animation
+   * @param {string} newState - New state for the pet
+   */
+  setState(newState) {
+    if (this.state === newState) return;
+    
+    this.state = newState;
+    
+    // Play corresponding animation
+    this.playAnimation(newState);
   }
   
   // Helper to count meshes
@@ -588,5 +702,245 @@ export class Pet {
       }
     });
     return count;
+  }
+  
+  /**
+   * Update pet needs based on time
+   * @param {number} deltaTime - Time since last update
+   */
+  updateNeeds(deltaTime) {
+    // Adjust for inactive tabs (use very small deltaTime for inactive tabs)
+    const adjustedDeltaTime = deltaTime * (this.state === 'sleeping' ? 0.5 : 1.0);
+    
+    // Hunger decreases over time (pet gets more hungry)
+    this.needs.hunger = Math.max(0, this.needs.hunger - adjustedDeltaTime * 1.0);
+    
+    // Happiness decreases over time
+    this.needs.happiness = Math.max(0, this.needs.happiness - adjustedDeltaTime * 0.8);
+    
+    // Energy decreases when active, increases slightly when sleeping
+    if (this.state === 'sleeping') {
+      this.needs.energy = Math.min(100, this.needs.energy + adjustedDeltaTime * 2.0);
+    } else {
+      this.needs.energy = Math.max(0, this.needs.energy - adjustedDeltaTime * 0.5);
+    }
+    
+    // Nuevas necesidades
+    // Higiene disminuye con el tiempo
+    this.needs.hygiene = Math.max(0, this.needs.hygiene - adjustedDeltaTime * 0.6);
+    
+    // Social disminuye cuando está solo
+    this.needs.social = Math.max(0, this.needs.social - adjustedDeltaTime * 0.7);
+    
+    // Loyalty se mantiene relativamente estable pero disminuye si otras necesidades están bajas
+    if (this.needs.hunger < 30 || this.needs.happiness < 30) {
+      this.needs.loyalty = Math.max(0, this.needs.loyalty - adjustedDeltaTime * 0.3);
+    }
+    
+    // Estado de la mascota basado en sus necesidades
+    this.updateStateBasedOnNeeds();
+  }
+  
+  /**
+   * Update pet state based on needs
+   */
+  updateStateBasedOnNeeds() {
+    // Si la mascota está muy cansada, eventualmente dormirá automáticamente
+    if (this.needs.energy < 15 && this.state !== 'sleeping') {
+      this.setState('sleeping');
+      return;
+    }
+    
+    // Si la mascota está muy hambrienta, se moverá más lentamente
+    if (this.needs.hunger < 20) {
+      this.walkSpeed = 0.2;
+    } else {
+      // Velocidad normal basada en energía
+      this.walkSpeed = 0.5 * (this.needs.energy / 100);
+    }
+    
+    // Comportamiento basado en felicidad
+    if (this.needs.happiness < 30 && this.state === 'walking') {
+      // Mascota triste: caminos más cortos, menos waypoints
+      this.pathComplexity.max = 3;
+    } else {
+      // Mascota feliz: caminos más complejos
+      this.pathComplexity.max = 6;
+    }
+  }
+  
+  /**
+   * Limpia a la mascota para aumentar su higiene
+   * @param {number} amount - Cantidad de higiene a restaurar
+   * @returns {boolean} - True si se limpió la mascota, false si ya estaba limpia
+   */
+  clean(amount) {
+    // Si la higiene ya está alta, no necesita limpieza
+    if (this.needs.hygiene > 80) {
+      return false;
+    }
+    
+    // Aumentar higiene
+    this.needs.hygiene = Math.min(100, this.needs.hygiene + amount);
+    
+    // Aumentar ligeramente la felicidad
+    this.needs.happiness = Math.min(100, this.needs.happiness + (amount * 0.2));
+    
+    // Cambiar estado a 'bathing' temporalmente
+    this.setState('bathing');
+    
+    // Volver a idle después de un tiempo
+    setTimeout(() => {
+      if (this.state === 'bathing') {
+        this.setState('idle');
+      }
+    }, 3000);
+    
+    return true;
+  }
+  
+  /**
+   * Socializar con la mascota para aumentar su nivel social
+   * @param {number} amount - Cantidad de socialización
+   * @returns {boolean} - True si socializó, false si no quería socializar
+   */
+  socialize(amount) {
+    // Si está muy cansada o muy hambrienta, no quiere socializar
+    if (this.needs.energy < 20 || this.needs.hunger < 20) {
+      return false;
+    }
+    
+    // Aumentar social
+    this.needs.social = Math.min(100, this.needs.social + amount);
+    
+    // Aumentar felicidad
+    this.needs.happiness = Math.min(100, this.needs.happiness + (amount * 0.5));
+    
+    // Aumentar lealtad
+    this.needs.loyalty = Math.min(100, this.needs.loyalty + (amount * 0.4));
+    
+    // Disminuir energía ligeramente
+    this.needs.energy = Math.max(0, this.needs.energy - (amount * 0.3));
+    
+    // Ganar experiencia
+    this.gainExperience(amount);
+    
+    // Cambiar estado a 'playing'
+    if (this.state !== 'playing') {
+      this.setState('playing');
+      
+      // Volver a idle después de un tiempo
+      setTimeout(() => {
+        if (this.state === 'playing') {
+          this.setState('idle');
+        }
+      }, 4000);
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Obtener un atributo aleatorio para mejorar
+   * @returns {string} - Nombre del atributo
+   */
+  getRandomAttribute() {
+    const attributes = ['attack', 'defense', 'speed', 'intelligence', 'agility', 'luck', 'resistance', 'adaptability'];
+    const index = Math.floor(Math.random() * attributes.length);
+    return attributes[index];
+  }
+  
+  /**
+   * Ganar experiencia para subir de nivel
+   * @param {number} amount - Cantidad de experiencia ganada
+   */
+  gainExperience(amount) {
+    // Aplicar bonificación por adaptabilidad
+    const adaptabilityBonus = 1 + (this.attributes.adaptability / 100);
+    const totalExp = amount * adaptabilityBonus;
+    
+    this.progression.experience += totalExp;
+    this.progression.evolutionPoints += totalExp * 0.5;
+    
+    // Comprobar si sube de nivel
+    if (this.progression.experience >= this.progression.requiredExpForNextLevel) {
+      this.levelUp();
+    }
+  }
+  
+  /**
+   * Subir de nivel y obtener puntos para asignar a estadísticas
+   */
+  levelUp() {
+    this.progression.level++;
+    this.progression.experience -= this.progression.requiredExpForNextLevel;
+    this.progression.requiredExpForNextLevel = Math.floor(this.progression.requiredExpForNextLevel * 1.5);
+    
+    // Otorgar 5 puntos de estadísticas para asignar
+    this.progression.statPoints += 5;
+    
+    // Restaurar parte de las necesidades
+    this.needs.hunger = Math.min(100, this.needs.hunger + 20);
+    this.needs.energy = Math.min(100, this.needs.energy + 30);
+    this.needs.happiness = Math.min(100, this.needs.happiness + 40);
+    
+    // Notificar al UI que se ha subido de nivel
+    if (this.game && this.game.ui) {
+      this.game.ui.showLevelUp(this.progression.level, { statPoints: 5 });
+    }
+    
+    // Si tenemos puntos de estadística por asignar, mostrar UI para asignarlos
+    this.showStatPointsUI();
+  }
+  
+  /**
+   * Mostrar UI para asignar puntos de estadística
+   */
+  showStatPointsUI() {
+    // Esta función sería implementada posteriormente
+    // Mostraría un panel donde el jugador puede asignar los puntos
+    console.log(`Tienes ${this.progression.statPoints} puntos para asignar a tus estadísticas`);
+  }
+  
+  /**
+   * Asignar puntos a una estadística específica
+   * @param {string} stat - La estadística a mejorar
+   * @param {number} points - La cantidad de puntos a asignar
+   * @returns {boolean} - True si se asignaron los puntos, false si no hay suficientes
+   */
+  assignStatPoints(stat, points = 1) {
+    // Verificar si hay suficientes puntos disponibles
+    if (this.progression.statPoints < points) {
+      return false;
+    }
+    
+    // Verificar si la estadística existe
+    if (this.attributes[stat] === undefined) {
+      return false;
+    }
+    
+    // Asignar los puntos
+    this.attributes[stat] += points;
+    this.progression.statPoints -= points;
+    
+    return true;
+  }
+  
+  /**
+   * Obtener la especialidad dominante
+   * @returns {string} - Clave de la especialidad dominante
+   */
+  getDominantSpecialty() {
+    let max = 0;
+    let dominantKey = '';
+    
+    for (const key in this.progression.specialty) {
+      if (this.progression.specialty[key] > max) {
+        max = this.progression.specialty[key];
+        dominantKey = key;
+      }
+    }
+    
+    return dominantKey;
   }
 } 
