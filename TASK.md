@@ -13,11 +13,17 @@
   - [x] Añadir efecto de baja resolución
 
 ### Semana 2: Prototipo de Mascota
-- [ ] Modelar mascota básica (tipo DataByte)
-- [ ] Implementar texturizado con efecto glitch
+- [x] Modelar mascota básica (tipo DataByte)
+- [x] Implementar texturizado con efecto glitch
 - [ ] Crear animaciones básicas (idle, caminar, dormir)
-- [ ] Desarrollar clase base para mascotas (atributos, estados)
-- [ ] Implementar sistema básico de necesidades (hambre, felicidad)
+- [x] Desarrollar clase base para mascotas (atributos, estados)
+- [x] Implementar sistema básico de necesidades (hambre, felicidad)
+
+### Problemas Descubiertos y Resueltos
+- [x] Corregir posicionamiento del modelo (clipping a través del suelo)
+- [x] Ajustar escala del modelo para mejor visualización
+- [x] Añadir debugging visual para posicionamiento del modelo
+- [x] Optimizar visualización de cámara para ver la mascota correctamente
 
 ### Semana 3: Interacción Básica
 - [ ] Crear interfaz de usuario mínima (HUD, menús)

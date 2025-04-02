@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Pet } from './game/pet.js'; // Import our new Pet class
 
 // Import shaders as text
 import ps1VertexShader from './shaders/ps1.vert?raw';
@@ -11,7 +12,7 @@ scene.background = new THREE.Color(0x1a1a1a); // Dark background
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 2, 5); // Position camera slightly above and back
+camera.position.set(0, 1, 3); // Position camera closer and lower to see the pet better
 
 // Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
@@ -84,11 +85,8 @@ const groundPlane = new THREE.Mesh(planeGeometry, ps1Material); // Use ShaderMat
 groundPlane.rotation.x = -Math.PI / 2; // Rotate to be horizontal
 scene.add(groundPlane);
 
-// // Basic Cube (for testing) - REMOVED
-// const geometry = new THREE.BoxGeometry();
-// const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-// const cube = new THREE.Mesh(geometry, material);
-// scene.add(cube);
+// Create our pet and add it to the scene
+const pet = new Pet(scene, 'Bitzy');
 
 // Handle Resize
 window.addEventListener('resize', () => {
@@ -109,11 +107,17 @@ window.addEventListener('resize', () => {
 
 // Animation Loop
 const clock = new THREE.Clock(); // Clock to track time
+let previousTime = 0;
 
 function animate() {
     requestAnimationFrame(animate);
 
     const elapsedTime = clock.getElapsedTime();
+    const deltaTime = elapsedTime - previousTime;
+    previousTime = elapsedTime;
+
+    // Update pet
+    pet.update(deltaTime);
 
     // Update shader time uniform
     ps1Material.uniforms.time.value = elapsedTime;
