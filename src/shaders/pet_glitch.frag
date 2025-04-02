@@ -4,6 +4,7 @@ varying vec3 vNormal;
 varying vec3 vPosition;
 
 uniform float time;
+uniform float glitchIntensity;
 uniform sampler2D uTexture;
 
 // Random function for noise generation
@@ -35,20 +36,20 @@ void main() {
     
     // Create UV distortion (texture warping) - PS1 effect
     vec2 distortedUV = vUv;
-    distortedUV.x += sin(distortedUV.y * 10.0 + time) * 0.01; 
-    distortedUV.y += cos(distortedUV.x * 10.0 + time) * 0.01;
+    distortedUV.x += sin(distortedUV.y * 10.0 + time) * 0.01 * glitchIntensity; 
+    distortedUV.y += cos(distortedUV.x * 10.0 + time) * 0.01 * glitchIntensity;
     
     // Sample texture with distorted UVs
     vec4 texColor = texture2D(uTexture, distortedUV);
     
     // Create color glitch effects
     // Chance for RGB shift
-    float rgbShiftChance = 0.05; // 5% chance per frame
+    float rgbShiftChance = 0.05 * glitchIntensity; // 5% chance per frame, affected by intensity
     float rgbSeed = random(vec2(floor(time * 5.0), 0.0));
     
     if (rgbSeed < rgbShiftChance) {
         // RGB shift effect
-        float shiftAmount = 0.01;
+        float shiftAmount = 0.01 * glitchIntensity;
         vec4 rChannel = texture2D(uTexture, distortedUV + vec2(shiftAmount, 0.0));
         vec4 gChannel = texture2D(uTexture, distortedUV);
         vec4 bChannel = texture2D(uTexture, distortedUV - vec2(shiftAmount, 0.0));
@@ -57,14 +58,14 @@ void main() {
     }
     
     // Add scanlines effect
-    float scanLineIntensity = 0.1;
+    float scanLineIntensity = 0.1 * glitchIntensity;
     float scanLineFreq = 100.0;
     float scanLine = sin(vUv.y * scanLineFreq + time * 5.0) * 0.5 + 0.5;
     scanLine = pow(scanLine, 8.0) * scanLineIntensity;
     texColor.rgb -= scanLine;
     
     // Occasionally add blocky corruption artifacts
-    float corruptionChance = 0.01; // 1% chance
+    float corruptionChance = 0.01 * glitchIntensity; // 1% chance, affected by intensity
     float corruptionSeed = random(vec2(floor(time * 2.0), floor(vUv.y * 10.0)));
     
     if (corruptionSeed < corruptionChance) {
@@ -83,7 +84,7 @@ void main() {
     }
     
     // Dithering effect (limited color palette - PS1 style)
-    float dither = random(vUv + time) * 0.05;
+    float dither = random(vUv + time) * 0.05 * glitchIntensity;
     texColor.rgb += dither;
     
     // Reduce color precision (PS1 had limited color depth)

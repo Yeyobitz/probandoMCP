@@ -15,7 +15,7 @@
 ### Semana 2: Prototipo de Mascota
 - [x] Modelar mascota básica (tipo DataByte)
 - [x] Implementar texturizado con efecto glitch
-- [ ] Crear animaciones básicas (idle, caminar, dormir)
+- [x] Crear animaciones básicas (idle, caminar, dormir)
 - [x] Desarrollar clase base para mascotas (atributos, estados)
 - [x] Implementar sistema básico de necesidades (hambre, felicidad)
 
@@ -24,6 +24,21 @@
 - [x] Ajustar escala del modelo para mejor visualización
 - [x] Añadir debugging visual para posicionamiento del modelo
 - [x] Optimizar visualización de cámara para ver la mascota correctamente
+- [x] Implementar sistema de waypoints para movimiento natural
+- [x] Crear visualización de caminos para debugging
+- [x] Ajustar velocidad de movimiento basada en nivel de energía
+- [x] Mejorar complejidad de caminos basada en nivel de felicidad
+
+### Detalles de Implementación
+- [x] Animaciones implementadas:
+  - [x] Idle: Bobbing suave y rotación lenta
+  - [x] Walking: Seguimiento de caminos aleatorios con waypoints
+  - [x] Sleeping: Respiración mediante escalado sutil
+- [x] Sistema de movimiento:
+  - [x] Generación de caminos aleatorios con transiciones suaves
+  - [x] Rotación para mirar en dirección del movimiento
+  - [x] Cambios de velocidad dinámicos según estado
+  - [x] Movimiento influenciado por necesidades (energía, felicidad)
 
 ### Semana 3: Interacción Básica
 - [ ] Crear interfaz de usuario mínima (HUD, menús)

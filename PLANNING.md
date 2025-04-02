@@ -15,42 +15,29 @@ DigiVirus es un simulador de mascotas virtuales 3D inspirado en Digimon, con gr�
 ```
 /
 ├── index.html
-├── assets/
-│   ├── models/          # Modelos 3D low poly
-│   ├── textures/        # Texturas pixeladas y patrones glitch
-│   │   ├── glitch_patterns/
-│   │   └── base_textures/
-│   ├── sounds/          # Efectos de sonido y música
-│   └── fonts/           # Fuentes estilo digital/glitch
-├── css/
-│   ├── main.css         # Estilos principales
-│   └── responsive.css   # Ajustes para dispositivos
-├── js/
-│   ├── main.js          # Punto de entrada
-│   ├── engine/          # Motor del juego
-│   │   ├── renderer.js  # Configuración de Three.js
-│   │   ├── controls.js  # Control de cámara e input
-│   │   ├── physics.js   # Colisiones y física simple
-│   │   └── glitch_shaders.js # Shaders personalizados
-│   ├── game/            # Lógica del juego
-│   │   ├── pet.js       # Clase de mascota y comportamiento
-│   │   ├── battle.js    # Sistema de combate ATB
-│   │   ├── evolution.js # Lógica de evolución
-│   │   ├── world.js     # Entorno 3D y zonas
-│   │   └── social.js    # Gestión social
-│   ├── ui/              # Interfaz de usuario
-│   │   ├── hud.js       # HUD durante el juego
-│   │   └── menus.js     # Menús y navegación
-│   └── network/         # Componente online
-│       ├── friends.js   # Gestión de amigos
-│       ├── sync.js      # Sincronización de datos
-│       └── visits.js    # Sistema de visitas
-├── lib/                 # Librerías externas
-│   ├── three.min.js
-│   └── firebase.js
-└── server/ (opcional)   # Backend ligero
-    ├── app.js
-    └── database.js
+├── public/
+│   └── assets/
+│       ├── pets/           # Modelos de mascotas
+│       └── textures/       # Texturas pixeladas y patrones glitch
+├── src/
+│   ├── main.js             # Punto de entrada
+│   ├── engine/             # Motor del juego
+│   ├── game/               # Lógica del juego
+│   │   └── pet.js          # Clase de mascota y comportamiento
+│   ├── ui/                 # Interfaz de usuario
+│   ├── network/            # Componente online
+│   ├── shaders/            # Shaders personalizados
+│   └── util/               # Utilidades
+├── tests/                  # Pruebas unitarias
+├── node_modules/           # Dependencias
+├── TASK.md                 # Tareas y progreso
+├── PETS.md                 # Definición de mascotas
+├── PLANNING.md             # Este documento
+├── package.json            # Configuración del proyecto
+├── package-lock.json       # Control de versiones de dependencias
+├── .eslintrc.json          # Configuración de linting
+├── .prettierrc.json        # Configuración de formato
+└── .gitignore              # Archivos ignorados por git
 ```
 
 ## Objetivos y Características

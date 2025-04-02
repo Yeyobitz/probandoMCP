@@ -4,6 +4,7 @@ varying vec3 vNormal;
 varying vec3 vPosition;
 
 uniform float time;
+uniform float glitchIntensity;
 
 // Function to generate a pseudo-random value from a seed
 float random(vec2 st) {
@@ -24,16 +25,16 @@ void main() {
     modelPosition.xyz = floor(modelPosition.xyz / snapStrength) * snapStrength;
     
     // Vertex jitter effect - classic PS1 look
-    float jitterAmount = 0.01;
+    float jitterAmount = 0.01 * glitchIntensity;
     float jitter = random(modelPosition.xy + time) * jitterAmount;
     modelPosition.xyz += vec3(jitter);
     
     // Glitch effect - makes parts of the model jump/teleport
     // Only applies occasionally for a better effect
-    float glitchChance = 0.02; // 2% chance per frame
+    float glitchChance = 0.02 * glitchIntensity; // 2% chance per frame, affected by intensity
     float glitchSeed = random(vec2(floor(time * 10.0), 0.0));
     if(glitchSeed < glitchChance) {
-        float glitchStrength = 0.2;
+        float glitchStrength = 0.2 * glitchIntensity;
         float glitchOffset = random(vPosition.xz * time) * glitchStrength;
         
         // Apply the glitch in a random direction
