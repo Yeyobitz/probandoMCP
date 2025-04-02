@@ -72,18 +72,21 @@ controls.enableDamping = true; // Smooth camera movement
 controls.dampingFactor = 0.05;
 controls.screenSpacePanning = false; // Prevent panning vertically off screen
 controls.maxPolarAngle = Math.PI / 2; // Prevent camera going below ground
+controls.minPolarAngle = 0.1; // Prevent camera from going too high up
+controls.minDistance = 1.5; // Prevent camera from getting too close to target
+controls.maxDistance = 10; // Prevent camera from going too far
+controls.target.y = 0.5; // Set target to always be just above ground level
 
 // Texture Loader
 const textureLoader = new THREE.TextureLoader();
 const groundTexture = textureLoader.load('assets/textures/ground.png');
 groundTexture.wrapS = THREE.RepeatWrapping; // Repeat texture horizontally
 groundTexture.wrapT = THREE.RepeatWrapping; // Repeat texture vertically
-groundTexture.repeat.set(4, 4); // Repeat texture 4 times in each direction
-groundTexture.magFilter = THREE.NearestFilter; // Pixelated look when close
-groundTexture.minFilter = THREE.NearestFilter; // Pixelated look when far
+groundTexture.magFilter = THREE.NearestFilter; // Mantener el look pixelado
+groundTexture.minFilter = THREE.NearestMipmapLinearFilter; // Mejor filtrado a distancia
 
 // Ground Plane
-const planeGeometry = new THREE.PlaneGeometry(10, 10, 10, 10); // Add segments for jitter
+const planeGeometry = new THREE.PlaneGeometry(50, 50, 10, 10); // Ajustado número de segmentos
 // const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x888888, side: THREE.DoubleSide }); // Grey color, visible from both sides - REPLACED
 const ps1Material = new THREE.ShaderMaterial({
     uniforms: {

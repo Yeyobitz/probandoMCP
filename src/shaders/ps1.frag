@@ -16,8 +16,11 @@ void main() {
     warpedUv.y += (rand(vUv.yx + time * 0.05) - 0.5) * 2.0 * warpIntensity;
     // ---
 
-    // Sample the texture with warped UVs
-    vec4 textureColor = texture2D(uTexture, warpedUv);
+    // Multiplicar las coordenadas UV para crear repetición
+    vec2 repeatedUv = warpedUv * 5.0;
+
+    // Sample the texture with warped and repeated UVs
+    vec4 textureColor = texture2D(uTexture, repeatedUv);
 
     // Output the texture color
     gl_FragColor = textureColor;
