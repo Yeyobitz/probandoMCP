@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Pet } from './pet.js';
 import UserInterface from '../ui/interface.js';
+import SaveSystem from './saveSystem.js';
 
 export default class Game {
   constructor(scene, camera, renderer) {
@@ -12,6 +13,14 @@ export default class Game {
     
     // Create pet
     this.pet = new Pet(scene, 'Bitzy');
+    
+    // Initialize SaveSystem
+    this.saveSystem = new SaveSystem(this);
+    
+    // Try to load saved game
+    if (this.saveSystem.hasSaveData()) {
+      this.saveSystem.loadGame();
+    }
     
     // Initialize UI
     this.ui = new UserInterface(this);
@@ -36,7 +45,8 @@ export default class Game {
     this.state = {
       isPaused: false,
       lastSaveTime: Date.now(),
-      saveInterval: 5 * 60 * 1000 // 5 minutes
+      saveInterval: 5 * 60 * 1000, // 5 minutes
+      isAutoSaveEnabled: true
     };
   }
   
@@ -53,7 +63,9 @@ export default class Game {
     this.ui.update();
     
     // Check for auto-save
-    this.checkAutoSave();
+    if (this.state.isAutoSaveEnabled) {
+      this.checkAutoSave();
+    }
   }
   
   /**
@@ -71,8 +83,37 @@ export default class Game {
    * Save game state to local storage
    */
   saveGame() {
-    // Will be implemented in a future task
-    console.log('Auto-saving game...');
+    const success = this.saveSystem.saveGame();
+    if (success) {
+      this.ui.showNotification('Juego guardado correctamente');
+    } else {
+      this.ui.showNotification('Error al guardar el juego', 5000);
+    }
+    return success;
+  }
+  
+  /**
+   * Load game state from local storage
+   */
+  loadGame() {
+    const success = this.saveSystem.loadGame();
+    if (success) {
+      this.ui.showNotification('Juego cargado correctamente');
+      this.ui.update(); // Force UI update with loaded data
+    } else {
+      this.ui.showNotification('Error al cargar el juego', 5000);
+    }
+    return success;
+  }
+  
+  /**
+   * Toggle auto-save feature
+   */
+  toggleAutoSave() {
+    this.state.isAutoSaveEnabled = this.saveSystem.toggleAutoSave();
+    const status = this.state.isAutoSaveEnabled ? 'activado' : 'desactivado';
+    this.ui.showNotification(`Autoguardado ${status}`);
+    return this.state.isAutoSaveEnabled;
   }
   
   /**

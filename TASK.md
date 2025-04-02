@@ -71,7 +71,7 @@
   - [x] Vista por defecto 
   - [x] Vista superior
   - [x] Vista en primera persona
-- [ ] Añadir sistema de guardado local básico
+- [x] Añadir sistema de guardado local básico
 - [x] Testing del prototipo y ajustes iniciales
   - [x] Corrección de z-index para visibilidad de UI
   - [x] Ajustes del comportamiento basado en necesidades

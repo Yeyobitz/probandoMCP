@@ -68,6 +68,8 @@ export default class UserInterface {
     
     // Menu buttons
     this.saveButton = document.getElementById('save-btn');
+    this.loadButton = document.getElementById('load-btn');
+    this.autoSaveButton = document.getElementById('autosave-btn');
     this.cameraButton = document.getElementById('camera-btn');
     this.debugButton = document.getElementById('debug-btn');
     this.closeMenuButton = document.getElementById('close-menu-btn');
@@ -111,6 +113,8 @@ export default class UserInterface {
     
     // Menu buttons
     this.saveButton.addEventListener('click', () => this.onSaveClick());
+    this.loadButton.addEventListener('click', () => this.onLoadClick());
+    this.autoSaveButton.addEventListener('click', () => this.onToggleAutoSave());
     this.cameraButton.addEventListener('click', () => this.cycleCamera());
     this.debugButton.addEventListener('click', () => this.toggleDebug());
     this.closeMenuButton.addEventListener('click', () => this.toggleMenu());
@@ -324,16 +328,35 @@ export default class UserInterface {
   }
   
   /**
-   * Save game state
+   * Save game handler
    */
   onSaveClick() {
-    // Will be implemented in a future task
-    this.showNotification('¡Juego guardado!');
-    this.toggleMenu();
+    this.game.saveGame();
+    this.toggleMenu(); // Close menu after saving
   }
   
   /**
-   * Cycle between camera views
+   * Load game handler
+   */
+  onLoadClick() {
+    this.game.loadGame();
+    this.toggleMenu(); // Close menu after loading
+  }
+  
+  /**
+   * Toggle auto-save handler
+   */
+  onToggleAutoSave() {
+    const isEnabled = this.game.toggleAutoSave();
+    
+    // Update button text to reflect current state
+    if (this.autoSaveButton) {
+      this.autoSaveButton.textContent = isEnabled ? 'Desactivar Autoguardado' : 'Activar Autoguardado';
+    }
+  }
+  
+  /**
+   * Cycle through camera views
    */
   cycleCamera() {
     const views = ['default', 'top-down', 'first-person'];
