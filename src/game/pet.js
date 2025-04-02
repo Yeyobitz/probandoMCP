@@ -232,22 +232,33 @@ export class Pet {
     }
   }
   
-  update(deltaTime) {
+  update(deltaTime, isWindowFocused = true) {
+    // If window is not focused, use a very small deltaTime to minimize movement
+    // This prevents the pet from running in straight lines when tab is inactive
+    if (!isWindowFocused) {
+      deltaTime = 0.001; // Almost no movement when tab is not focused
+    }
+    
+    // Limit the maximum deltaTime to prevent large jumps when tab loses focus
+    // This will avoid the pet "teleporting" or moving in a straight line when tab regains focus
+    const maxDeltaTime = 0.1; // Maximum 100ms per update
+    const clampedDeltaTime = Math.min(deltaTime, maxDeltaTime);
+    
     // Update animation mixer
     if (this.mixer) {
-      this.mixer.update(deltaTime);
+      this.mixer.update(clampedDeltaTime);
     }
     
     // Update pet behavior based on current state
     switch (this.state) {
       case 'idle':
-        this.updateIdleBehavior(deltaTime);
+        this.updateIdleBehavior(clampedDeltaTime);
         break;
       case 'walking':
-        this.updateWalkingBehavior(deltaTime);
+        this.updateWalkingBehavior(clampedDeltaTime);
         break;
       case 'sleeping':
-        this.updateSleepingBehavior(deltaTime);
+        this.updateSleepingBehavior(clampedDeltaTime);
         break;
     }
     
@@ -255,7 +266,7 @@ export class Pet {
     if (this.model) {
       this.model.traverse((child) => {
         if (child.isMesh && child.material.uniforms) {
-          child.material.uniforms.time.value += deltaTime;
+          child.material.uniforms.time.value += clampedDeltaTime;
           
           // Adjust glitch based on pet state
           // More glitches when hungry or unhappy
@@ -276,9 +287,9 @@ export class Pet {
     }
     
     // Decrease needs over time (very slowly for now)
-    this.needs.hunger = Math.max(0, this.needs.hunger - deltaTime * 0.05);
-    this.needs.happiness = Math.max(0, this.needs.happiness - deltaTime * 0.03);
-    this.needs.energy = Math.max(0, this.needs.energy - deltaTime * 0.02);
+    this.needs.hunger = Math.max(0, this.needs.hunger - clampedDeltaTime * 0.05);
+    this.needs.happiness = Math.max(0, this.needs.happiness - clampedDeltaTime * 0.03);
+    this.needs.energy = Math.max(0, this.needs.energy - clampedDeltaTime * 0.02);
     
     // Change state based on needs
     this.updateState();
@@ -344,35 +355,68 @@ export class Pet {
     
     // Move towards current waypoint
     const currentPos = this.model.position;
-    const direction = new THREE.Vector3()
-      .subVectors(currentWaypoint, currentPos)
-      .normalize();
     
-    // Rotate to face movement direction
-    if (direction.x !== 0 || direction.z !== 0) {
-      const targetRotation = Math.atan2(direction.x, direction.z);
-      this.model.rotation.y = targetRotation;
+    // Calculate distance to waypoint before moving
+    const distanceToWaypoint = currentPos.distanceTo(currentWaypoint);
+    
+    // Calculate the maximum distance we can move in this frame
+    const maxMovementThisFrame = this.walkSpeed * deltaTime;
+    
+    // If we would overshoot the waypoint in this step, just move directly to the waypoint
+    if (distanceToWaypoint <= maxMovementThisFrame) {
+      // Set position directly to waypoint to avoid overshooting
+      currentPos.copy(currentWaypoint);
+      
+      // Move to next waypoint
+      this.currentWaypointIndex++;
+      
+      // If we reached the end of the path, go back to idle
+      if (this.currentWaypointIndex >= this.waypoints.length) {
+        this.playAnimation('idle');
+      } else {
+        // If we have more waypoints and we still have movement left,
+        // use the remaining movement to go toward the next waypoint
+        const remainingMovement = maxMovementThisFrame - distanceToWaypoint;
+        
+        if (remainingMovement > 0 && this.currentWaypointIndex < this.waypoints.length) {
+          const nextWaypoint = this.waypoints[this.currentWaypointIndex];
+          const nextDirection = new THREE.Vector3()
+            .subVectors(nextWaypoint, currentPos)
+            .normalize();
+            
+          // Calculate rotation to face next waypoint
+          if (nextDirection.x !== 0 || nextDirection.z !== 0) {
+            this.model.rotation.y = Math.atan2(nextDirection.x, nextDirection.z);
+          }
+          
+          // Move partially toward the next waypoint with remaining movement
+          const nextDistance = currentPos.distanceTo(nextWaypoint);
+          const moveAmount = Math.min(remainingMovement, nextDistance);
+          
+          currentPos.x += nextDirection.x * moveAmount;
+          currentPos.z += nextDirection.z * moveAmount;
+        }
+      }
+    } else {
+      // Calculate direction to current waypoint
+      const direction = new THREE.Vector3()
+        .subVectors(currentWaypoint, currentPos)
+        .normalize();
+        
+      // Rotate to face movement direction
+      if (direction.x !== 0 || direction.z !== 0) {
+        const targetRotation = Math.atan2(direction.x, direction.z);
+        this.model.rotation.y = targetRotation;
+      }
+      
+      // Regular movement, not close enough to waypoint
+      currentPos.x += direction.x * maxMovementThisFrame;
+      currentPos.z += direction.z * maxMovementThisFrame;
     }
-    
-    // Move pet
-    currentPos.x += direction.x * this.walkSpeed * deltaTime;
-    currentPos.z += direction.z * this.walkSpeed * deltaTime;
     
     // Update debug cube position
     if (this.debugCube) {
       this.debugCube.position.copy(currentPos);
-    }
-    
-    // Check if close to current waypoint
-    const distanceToWaypoint = currentPos.distanceTo(currentWaypoint);
-    if (distanceToWaypoint < 0.1) {
-      // Move to next waypoint
-      this.currentWaypointIndex++;
-      
-      // If reached the end of the path, go back to idle
-      if (this.currentWaypointIndex >= this.waypoints.length) {
-        this.playAnimation('idle');
-      }
     }
     
     // Walking consumes more energy

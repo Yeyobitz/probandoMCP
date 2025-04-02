@@ -28,6 +28,7 @@
 - [x] Crear visualización de caminos para debugging
 - [x] Ajustar velocidad de movimiento basada en nivel de energía
 - [x] Mejorar complejidad de caminos basada en nivel de felicidad
+- [x] Corregir comportamiento del movimiento cuando la ventana pierde el foco
 
 ### Detalles de Implementación
 - [x] Animaciones implementadas:
@@ -39,6 +40,8 @@
   - [x] Rotación para mirar en dirección del movimiento
   - [x] Cambios de velocidad dinámicos según estado
   - [x] Movimiento influenciado por necesidades (energía, felicidad)
+  - [x] Control del deltaTime para prevenir saltos grandes cuando la ventana pierde foco
+  - [x] Detección mejorada de waypoints para evitar que la mascota se "pase de largo"
 
 ### Semana 3: Interacción Básica
 - [ ] Crear interfaz de usuario mínima (HUD, menús)

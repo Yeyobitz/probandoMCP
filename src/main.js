@@ -10,6 +10,19 @@ import ps1FragmentShader from './shaders/ps1.frag?raw';
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1a1a); // Dark background
 
+// Tab focus detection
+let isWindowFocused = true;
+
+window.addEventListener('blur', () => {
+  isWindowFocused = false;
+  console.log('Window lost focus');
+});
+
+window.addEventListener('focus', () => {
+  isWindowFocused = true;
+  console.log('Window gained focus');
+});
+
 // Camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 1, 3); // Position camera closer and lower to see the pet better
@@ -116,8 +129,8 @@ function animate() {
     const deltaTime = elapsedTime - previousTime;
     previousTime = elapsedTime;
 
-    // Update pet
-    pet.update(deltaTime);
+    // Update pet with window focus state
+    pet.update(deltaTime, isWindowFocused);
 
     // Update shader time uniform
     ps1Material.uniforms.time.value = elapsedTime;
